@@ -1,3 +1,5 @@
+module Tetris where
+
 import Control.Exception
 import Control.Concurrent
 import Control.Monad
@@ -5,7 +7,7 @@ import System.IO
 
 import TetrisGame
 import Terminal
-import Music
+-- import Music
 import Wire
 
 data TwoPlayerGame = TwoPlayerGame { game :: Game,
@@ -14,9 +16,10 @@ data TwoPlayerGame = TwoPlayerGame { game :: Game,
                                      oppBoard :: [[Int]] }
                                      deriving (Show)
 
-
+blockDisplay :: Int -> [Char]
 blockDisplay n = ("   " : [colored color "xxx" | color <- ["red", "yellow", "green", "blue", "magenta", "cyan", "white"]])!!n
 
+display :: TwoPlayerGame -> IO ()
 display tpg = boardDisplay2 (boardView (game tpg)) (oppBoard tpg)
 
 boardDisplay board = do
@@ -80,10 +83,10 @@ newTwoPlayerGame sock =
 
 mainIO sock = foldM_ tick (newTwoPlayerGame sock) [0..]
 
-main = do
+startApp = do
     putStrLn $ colored "red" "Let's play Tetris!"
     sock <- connect
-    startMusic
+    -- startMusic
     bracket_
         (do
             hSetBuffering stdin NoBuffering
@@ -97,4 +100,3 @@ main = do
             putStrLn "bye"
             )
         (mainIO sock)
-
