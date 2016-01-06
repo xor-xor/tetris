@@ -6,17 +6,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Terminal
-                     , Wire
+  exposed-modules:     Piece
+                     , Terminal
                      , TetrisGame
-                     , Piece
                      , Tetris
   build-depends:       base >= 4.7 && < 5
-                     -- , ALUT
-                     , regex-compat
-                     , network
-                     , bytestring
-                     , split
   -- ghc-options:         -fforce-recomp
   default-language:    Haskell2010
 
