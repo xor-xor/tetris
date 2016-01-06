@@ -5,18 +5,15 @@ import Control.Concurrent
 import Control.Monad
 import System.IO
 
-import qualified TetrisGame as TG
+import TetrisGame (Game, boardView, newGame, gameTick)
 import Terminal (colored, cursorToBottomLeft, cursorUp, newScreen)
-
-newtype Game = Game { game :: TG.Game }
-    deriving (Show)
 
 blockDisplay :: Int -> [Char]
 blockDisplay n = ("   " : [colored color "xxx" | color <- colors]) !! n
     where colors = ["red", "yellow", "green", "blue", "magenta", "cyan", "white"]
 
 display :: Game -> IO ()
-display g = boardDisplay (TG.boardView (game g))
+display g = boardDisplay (boardView g)
 
 boardDisplay :: [[Int]] -> IO ()
 boardDisplay board = displayLines
@@ -46,14 +43,7 @@ tick g i = do
     display g
     inputReady <- hWaitForInput stdin 300
     c <- if inputReady then getChar else return ' '
-    let newgame = TG.gameTick (game g) c
-    return (Game newgame)
-
-processMsg :: Game -> a -> Game
-processMsg g _ = g
-
-newGame :: Game
-newGame = Game TG.newGame
+    return (gameTick g c)
 
 mainIO :: IO ()
 mainIO = foldM_ tick newGame [0..]
