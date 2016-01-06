@@ -5,32 +5,27 @@ import Control.Concurrent
 import Control.Monad
 import System.IO
 
-import TetrisGame (Game, boardView, newGame, gameTick)
-import Terminal (colored, cursorToBottomLeft, cursorUp, newScreen)
+import TetrisGame (Game, Board, boardView, newGame, gameTick)
+import Terminal (Color(..), colored, cursorToBottomLeft, cursorUp, newScreen)
 
-blockDisplay :: Int -> [Char]
+blockDisplay :: Int -> String
 blockDisplay n = ("   " : [colored color "xxx" | color <- colors]) !! n
-    where colors = ["red", "yellow", "green", "blue", "magenta", "cyan", "white"]
+    where colors = [Red, Yellow, Green, Blue, Magenta, Cyan, White]
 
 display :: Game -> IO ()
-display g = boardDisplay (boardView g)
+display = boardDisplay . boardView
 
-boardDisplay :: [[Int]] -> IO ()
-boardDisplay board = displayLines
-     (["+" ++ replicate 30 '-' ++ "+"] ++
-      (lineStrings board) ++
-      ["+" ++ replicate 30 '-' ++ "+"])
+boardDisplay :: Board -> IO ()
+boardDisplay board = displayLines $ ["+" ++ replicate 30 '-' ++ "+"] ++
+                                    lineStrings board ++
+                                    ["+" ++ replicate 30 '-' ++ "+"]
 
-lineStrings :: [[Int]] -> [[Char]]
-lineStrings lines =
-    if null lines
-        then
-            []
-        else
-            let line = head lines in
-                ["|" ++ concat [blockDisplay x | x <- line] ++ "|",
-                 "|" ++ concat [blockDisplay x | x <- line] ++ "|"] ++
-                lineStrings (tail lines)
+lineStrings :: Board -> [String]
+lineStrings [] = []
+lineStrings lines = [ "|" ++ concat [blockDisplay x | x <- line] ++ "|"
+                    , "|" ++ concat [blockDisplay x | x <- line] ++ "|"
+                    ] ++ lineStrings (tail lines)
+                        where line = head lines
 
 displayLines :: [String] -> IO()
 displayLines lines = do
@@ -41,7 +36,8 @@ displayLines lines = do
 tick :: Game -> Int -> IO Game
 tick g i = do
     display g
-    inputReady <- hWaitForInput stdin 300
+    let gameSpeed = 300
+    inputReady <- hWaitForInput stdin gameSpeed
     c <- if inputReady then getChar else return ' '
     return (gameTick g c)
 
@@ -49,7 +45,7 @@ mainIO :: IO ()
 mainIO = foldM_ tick newGame [0..]
 
 startApp = do
-    putStrLn $ colored "red" "Let's play Tetris!"
+    putStrLn $ colored Red "Let's play Tetris!"
     bracket_
         (do
             hSetBuffering stdin NoBuffering

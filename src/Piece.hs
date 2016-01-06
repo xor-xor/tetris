@@ -1,15 +1,17 @@
 module Piece where
 
+type Spot = (Int, Int)
 
-data Piece = P { spots :: [ (Int, Int) ],
-                 texture :: Int }
-                 deriving (Show, Eq)
+data Piece = P { spots   :: [Spot]
+               , texture :: Int
+               } deriving (Show, Eq)
 
--- matches GameBoy rotation system
+
+-- | Matches GameBoy rotation system.
 pieceI1 = P [(0, 2), (1, 2), (2, 2), (3, 2)] 1
 pieceI2 = P [(2, 0), (2, 1), (2, 2), (2, 3)] 1
 
-pieceO = P [(0, 0), (0, 1), (1, 0), (1, 1)] 2
+pieceO  = P [(0, 0), (0, 1), (1, 0), (1, 1)] 2
 
 pieceJ1 = P [(0, 1), (1, 1), (2, 1), (2, 2)] 3
 pieceJ2 = P [(0, 2), (1, 2), (1, 1), (1, 0)] 3
@@ -34,10 +36,10 @@ pieceZ2 = P [(1, 2), (1, 1), (2, 1), (2, 0)] 7
 
 
 rotate :: Piece -> Piece
-rotate p = case () of  -- can I split this up?
+rotate p = case () of  -- XXX can I split this up?
     () | p == pieceI1 -> pieceI2
        | p == pieceI2 -> pieceI1
-       | p == pieceO -> pieceO
+       | p == pieceO  -> pieceO
        | p == pieceJ1 -> pieceJ2
        | p == pieceJ2 -> pieceJ3
        | p == pieceJ3 -> pieceJ4
@@ -69,5 +71,3 @@ psuedoRandomPiece i = let rn = msprng i in
 
 msprng :: Int -> Int
 msprng i = mod (quot (i^2) 1000) 1000000
-
-
